@@ -1,8 +1,10 @@
+from PyQt5.QtCore import QObject
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import QAction, QDataWidgetMapper, QHBoxLayout, QLineEdit, QMainWindow, QMessageBox, QPushButton, \
     QTabWidget, QTableView, QToolTip, QVBoxLayout, QWidget, qApp
 from sqlalchemy.orm import Session
 
+from gui.exchange import ExchangeTableModel
 from gui.stock import StockCreateDialog, StockListModel
 
 
@@ -49,11 +51,25 @@ class StockWidget(QWidget):
         self.stock_create_widget.exec_()
 
 
+class ExchangeWidget(QWidget):
+
+    def __init__(self, session: Session, parent: QObject=None):
+        super().__init__(parent)
+        self.session = session
+
+        layout = QVBoxLayout()
+        exchange_table = QTableView(self)
+        exchange_table.setModel(ExchangeTableModel(self.session))
+        layout.addWidget(exchange_table)
+
+        self.setLayout(layout)
+
+
 class DatabaseTab(QTabWidget):
     def __init__(self, session: Session, parent=None):
         super().__init__(parent)
         self.addTab(StockWidget(session, self), "Stocks")
-        self.addTab(QWidget(self), "Exchange")
+        self.addTab(ExchangeWidget(session, self), "Exchanges")
 
 
 class RegressionTab(QTabWidget):

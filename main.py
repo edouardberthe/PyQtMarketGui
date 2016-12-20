@@ -3,7 +3,7 @@ import sys
 from PyQt5.QtWidgets import QApplication
 
 from database import session
-from models import *
+from metadata import *
 from gui.main_window import MainWindow
 
 

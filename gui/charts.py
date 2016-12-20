@@ -6,7 +6,7 @@ from matplotlib.figure import Figure
 from numpy import linspace
 from numpy.ma import cos, sin
 
-from models.stock import Stock
+from metadata.stock import Stock
 
 
 class StockDataChart(QWidget):

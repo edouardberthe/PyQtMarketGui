@@ -1,38 +1,68 @@
 import sys
+from abc import ABCMeta, abstractproperty
+from typing import List
 
-from PyQt5.QtCore import QAbstractListModel, QModelIndex, Qt
-from PyQt5.QtWidgets import QDialog
-from PyQt5.QtWidgets import QFormLayout, QLabel, QLineEdit, QMessageBox, QPushButton, QSizePolicy, QSpacerItem, QWidget, \
+from PyQt5.QtCore import QAbstractTableModel, QModelIndex, Qt
+from PyQt5.QtWidgets import QDialog, QFormLayout, QLabel, QLineEdit, QMessageBox, QPushButton, QSizePolicy, QSpacerItem, \
     qApp
 
-from models import Stock
+from metadata import Stock
 
 
-class StockListModel(QAbstractListModel):
+class AbstractTableModel(QAbstractTableModel):
+
+    __metaclass__ = ABCMeta
 
     def __init__(self, session):
         super().__init__()
         self.session = session
-        self.stocks = []
+        self.entities = []
         self.refresh()
 
-    def refresh(self):
-        self.stocks = self.session.query(Stock).all()
+    @abstractproperty
+    def entity(self):
+        raise NotImplementedError
 
-    def rowCount(self, parent=None, *args, **kwargs):
-        return len(self.stocks)
+    @abstractproperty
+    def header(self) -> List[str]:
+        raise NotImplementedError
+
+    @abstractproperty
+    def cols(self) -> List[str]:
+        raise NotImplementedError
+
+    def refresh(self):
+        self.entities = self.session.query(self.entity).all()
 
     def data(self, index: QModelIndex, role: int=None):
-        col = index.column()
-        stock = self.stocks[index.row()]
+        entity = self.entities[index.row()]
         if role == Qt.DisplayRole:
-            if col == 0:
-                return stock.ticker
-            elif col == 1:
-                return stock.name
+            return str(getattr(entity, self.cols[index.column()]))
+
+    def headerData(self, p_int, orientation, role=None):
+        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+            return self.header[p_int]
 
     def columnCount(self, *args, **kwargs):
-        return 2
+        return len(self.cols)
+
+    def rowCount(self, parent=None, *args, **kwargs):
+        return len(self.entities)
+
+
+class StockListModel(AbstractTableModel):
+
+    @property
+    def entity(self):
+        return Stock
+
+    @property
+    def cols(self):
+        return ['name', 'ticker', 'exchange']
+
+    @property
+    def header(self):
+        return ['Name', 'Ticker', 'Exchange']
 
 
 class StockCreateDialog(QDialog):
@@ -79,7 +109,6 @@ class StockCreateDialog(QDialog):
         if self.name_edit.text() != '' and self.ticker_edit.text() != '':
             try:
                 self.session.add(Stock(ticker=self.ticker_edit.text(), name=self.name_edit.text()))
-                self.window().statusBar().showMessage('Successfully inserted')
                 self.session.commit()
                 self.name_edit.setText("")
                 self.ticker_edit.setText("")
