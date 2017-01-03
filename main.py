@@ -2,12 +2,9 @@ import sys
 
 from PyQt5.QtWidgets import QApplication
 
-from database import session
-from metadata import *
-from gui.main_window import MainWindow
-
+from gui.main.window import MainWindow
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    ex = MainWindow(session)
+    ex = MainWindow()
     sys.exit(app.exec_())

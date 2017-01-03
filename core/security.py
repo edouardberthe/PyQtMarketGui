@@ -1,6 +1,7 @@
 import pandas as pd
 from pandas_datareader._utils import RemoteDataError
 from pandas_datareader.data import DataReader
+from sqlalchemy import orm
 
 from core.exchange import Exchange
 from exceptions import NoStockDataError
@@ -12,6 +13,7 @@ class Security:
         self.ticker = ticker
         self.exchange = exchange
         self.name = name
+        self._data = None
 
     def __str__(self):
         return self.name if self.name is not None else self.yahoo_ticker
@@ -34,31 +36,36 @@ class Security:
             self._data.name = 'Adj Close'
 
     def load_from_yahoo(self, start='2005-01-01', end=None):
-        print('Loading data of', self, ' from yahoo')
+        print("Loading data of", self, " from Yahoo API")
         try:
             self._data = DataReader(self.yahoo_ticker, 'yahoo', start, end)['Adj Close']
+            self.save()
         except RemoteDataError as e:
-            print('Data not loaded', e)
+            print("Error while loading data from Yahoo API:", e)
 
     @property
     def data(self):
+        """Getter to _data internal private property. Useful for lazy loading of the data in database."""
         if self._data is None:
             try:
                 self.load_from_db()
             except NoStockDataError:
-                self.load_from_yahoo()
+                self._data = pd.DataFrame()
         return self._data
 
     def save(self):
-        """Performs an update of the database by overriding the valuations by the values inside _data (needs previous
-        action of data).
+        """
+        Performs an update of the database by overriding the valuations by the values inside _data (needs previous
+        action of load_from_yahoo).
         """
         if self._data is not None:
             from database import engine
             copy = pd.DataFrame(self._data)
             copy['stock_id'] = self.id
             copy.columns = ['value', 'stock_id']
+            copy.index.name = 'date'
             copy.to_sql('adj_close', engine, if_exists='append')
+            print("Data of", self, "saved to database.")
         else:
             print("Not saving: no internal Data loaded in ", self)
 
@@ -70,7 +77,10 @@ class Security:
 
 
 class Stock(Security):
-    pass
+
+    @orm.reconstructor
+    def init_on_load(self):
+        self._data = None
 
 
 class Index(Security):

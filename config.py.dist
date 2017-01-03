@@ -1,0 +1,8 @@
+config = {
+    'db_debug': False,
+    'db_pdo': '',
+    'db_user': '',
+    'db_password': '',
+    'db_host': '',
+    'db_port': 0
+}

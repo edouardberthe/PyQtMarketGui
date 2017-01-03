@@ -1,5 +1,7 @@
-PyQt5
+lxml
+matplotlib
 numpy
 pandas
 pandas_datareader
-matplotlib
+psycopg2
+PyQt5
