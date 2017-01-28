@@ -39,6 +39,10 @@ class AbstractTableModel(QAbstractTableModel):
         if role == Qt.DisplayRole:
             return str(getattr(self.entity(index), self.cols[index.column()]))
 
+    def setData(self, index: QModelIndex, value, role=None):
+        setattr(self.entity(index), self.cols[index.column()], value)
+        return True
+
     def headerData(self, p_int, orientation, role=None):
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
             return self.header[p_int]

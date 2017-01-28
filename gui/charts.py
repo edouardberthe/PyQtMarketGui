@@ -44,8 +44,6 @@ class StockDataChart(QWidget):
         try:
             self._stock.data.plot(ax=self.axes)
         except TypeError as e:
-            msgBox = QMessageBox()
-            msgBox.setText("Error while plotting stock {}".format(str(self._stock)))
-            msgBox.exec()
+            print("Error while plotting stock {}".format(str(self._stock)))
         else:
             self.canvas.draw()

@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QHBoxLayout, QPushButton, QTableView, QVBoxLayout, QWidget
 
+from core import Exchange
 from database import Session
 from gui.exchange import ExchangeCreateDialog, ExchangeTableModel
 
@@ -42,4 +43,9 @@ class ExchangeWidget(QWidget):
         main_layout.addStretch(1)
 
     def new(self):
-        ExchangeCreateDialog(self.session).exec()
+        dialog = ExchangeCreateDialog(self.session)
+        dialog.created.connect(self.updateStatusBar)
+        dialog.exec()
+
+    def updateStatusBar(self, exchange: Exchange):
+        self.window().statusBar().showMessage('Exchange {} added'.format(exchange))

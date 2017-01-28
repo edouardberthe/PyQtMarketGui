@@ -3,10 +3,7 @@ from PyQt5.QtWidgets import QAction, QMainWindow, QTabWidget, \
     QToolTip, qApp
 
 from gui.main.database import DatabaseTab
-
-
-class RegressionTab(QTabWidget):
-    pass
+from .regression import RegressionTab
 
 
 class MainWindow(QMainWindow):
@@ -33,7 +30,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(central_widget)
 
         # Window Size and Title
-        self.setGeometry(300, 200, 800, 500)
+        self.setGeometry(100, 100, 1200, 700)
         self.setWindowTitle('Tooltips')
 
         self.show()

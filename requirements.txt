@@ -5,3 +5,4 @@ pandas
 pandas_datareader
 psycopg2
 PyQt5
+sqlalchemy

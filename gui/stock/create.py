@@ -2,8 +2,9 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QCompleter, QDialog, QFormLayout, QLineEdit, QListView, QMessageBox, QPushButton, \
     QSizePolicy, QSpacerItem, qApp
 
+from core import Stock
 from database import Session
-from metadata import Stock
+from gui.exchange.model import ExchangeSearchModel
 
 
 class StockCreateDialog(QDialog):
@@ -14,47 +15,48 @@ class StockCreateDialog(QDialog):
         self.session = Session()
 
         # Form
-        self.form = QFormLayout()
-        self.form.setSpacing(5)
-        self.setLayout(self.form)
+        form = QFormLayout()
+        form.setSpacing(5)
+        self.setLayout(form)
 
         # Name
         self.name_edit = QLineEdit()
-        self.form.addRow("Name: ", self.name_edit)
+        form.addRow("Name: ", self.name_edit)
 
         # Ticker
         self.ticker_edit = QLineEdit()
-        self.form.addRow("Ticker: ", self.ticker_edit)
+        form.addRow("Ticker: ", self.ticker_edit)
 
         # Exchange Table
         self.exchange_model = ExchangeTableModel(self.session)
         self.exchange_list = QListView(self)
         self.exchange_list.setModel(self.exchange_model)
-        self.form.addRow("Exchange :", self.exchange_list)
+        form.addRow("Exchange :", self.exchange_list)
 
         # Exchange Completer Line Edit test
         self.exchange_edit = QLineEdit()
         exchange_completer = QCompleter()
         exchange_completer.setCaseSensitivity(Qt.CaseInsensitive)
-        exchange_completer.setModel(ExchangeTableModel(session=self.session))
+        exchange_completer.setModel(ExchangeSearchModel(self.session))
+        exchange_completer.setCompletionRole(Qt.DisplayRole)
+        exchange_completer.setFilterMode(Qt.MatchContains)
         self.exchange_edit.setCompleter(exchange_completer)
-        self.form.addRow('Exchange 2nd :', self.exchange_edit)
+        form.addRow('Exchange 2nd :', self.exchange_edit)
 
         # Space
-        self.form.addItem(QSpacerItem(100, 100, QSizePolicy.Expanding, QSizePolicy.Fixed))
+        form.addItem(QSpacerItem(100, 100, QSizePolicy.Expanding, QSizePolicy.Fixed))
 
         # Buttons
         submit = QPushButton("Submit and close", self)
-        submit.setStyleSheet("background-color: red")
         close = QPushButton(self)
         close.setText("Close")
-        self.form.addWidget(submit)
-        self.form.addWidget(close)
+        form.addWidget(submit)
+        form.addWidget(close)
 
         self.name_edit.returnPressed.connect(self.submitQuery)
         self.ticker_edit.returnPressed.connect(self.submitQuery)
         submit.clicked.connect(self.submitQuery)
-        close.clicked.connect(qApp.quit)
+        close.clicked.connect(self.close)
 
     def submitQuery(self):
         ticker = self.ticker_edit.text()

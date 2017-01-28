@@ -1,22 +1,29 @@
+from typing import List
+
 import numpy as np
 import pandas as pd
 
+from .security import Stock
 
-class Group(list):
 
-    _data = None
+class Bucket(list):
+
+    def __init__(self, stocks: List[Stock]=[], name=None):
+        super().__init__(stocks)
+        self.name = name
+        self._data = None
+
+    def __str__(self):
+        return self.name if self.name is not None else "Unnamed Bucket"
+
+    def __repr__(self):
+        return "<Bucket {:s}>".format(self.name) if self.name is not None else "<Bucket Unnamed>"
 
     @property
     def data(self):
         if self._data is None:
-            self.load_from_pickle()
+            self._data = pd.DataFrame({s.ticker: s.data for s in self})
         return self._data
-
-    def save(self):
-        self.data.to_pickle("pickle/data.pkl")
-
-    def load_from_pickle(self):
-        self._data = pd.read_pickle("pickle/data.pkl")
 
     def load_from_yahoo(self):
         _data = pd.DataFrame({s.ticker: s.data for s in self})
@@ -37,9 +44,6 @@ class Group(list):
         return self.gross() - 1
 
 
-PA = Exchange('Paris', 'PA')
-CAC40Tickers = ['AC', 'ACA', 'AI', 'AIR', 'BN', 'BNP', 'CA', 'CAP', 'CS', 'DG', 'EI', 'EN', 'ENGI', 'FP', 'FR', 'GLE', 'KER', 'LHN', 'LI', 'LR', 'MC', 'ML', 'MT', 'NOKIA', 'OR', 'ORA', 'PUB', 'RI', 'RNO', 'SAF', 'SAN', 'SGO', 'SOLB', 'SU', 'SW', 'TEC', 'UG', 'UL', 'VIE', 'VIV']
-CAC40 = Group([Stock(ticker, PA) for ticker in CAC40Tickers])
 Returns = pd.DataFrame()
 DailyMeanReturns = Returns.mean()
 MeanReturns = DailyMeanReturns * 252

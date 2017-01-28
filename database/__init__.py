@@ -1,8 +1,9 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from metadata import metadata
 from config import config
+from .mapping import *
+from .metadata import metadata
 
 engine = create_engine('{:s}://{:s}:{:s}@{:s}:{:d}/{:s}'.format(
     config['db_pdo'],

@@ -15,5 +15,3 @@ class StockTableModel(AbstractTableModel):
     @property
     def header(self):
         return ['Name', 'Ticker', 'Exchange']
-
-

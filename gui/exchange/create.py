@@ -1,13 +1,13 @@
-from PyQt5.QtWidgets import QDialog
-from PyQt5.QtWidgets import QFormLayout
-from PyQt5.QtWidgets import QGridLayout, QLabel, QLineEdit, QWidget
-from PyQt5.QtWidgets import QPushButton
+from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtWidgets import QDialog, QFormLayout, QLineEdit, QPushButton
 
 from core import Exchange
 from database import Session
 
 
 class ExchangeCreateDialog(QDialog):
+
+    created = pyqtSignal(Exchange)
 
     def __init__(self, session=Session()):
         super().__init__()
@@ -48,14 +48,19 @@ class ExchangeCreateDialog(QDialog):
         if ticker != '':
             name = self.name_edit.text()
             if name == '':
-                self.session.add(Exchange(ticker=ticker))
+                exchange = Exchange(ticker=ticker)
             else:
-                self.session.add(Exchange(ticker=ticker, name=name))
+                exchange = Exchange(ticker=ticker, name=name)
             try:
+                self.session.add(exchange)
                 self.session.commit()
             except Exception as e:
                 print("Error while inserting:", e)
                 self.session.rollback()
+            else:
+                self.created.emit(exchange)
+                self.ticker_edit.clear()
+                self.name_edit.clear()
 
     def submitAndClose(self):
         self.submit()
