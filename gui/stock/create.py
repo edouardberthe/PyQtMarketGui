@@ -1,10 +1,9 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QCompleter, QDialog, QFormLayout, QLineEdit, QListView, QMessageBox, QPushButton, \
-    QSizePolicy, QSpacerItem, qApp
+from PyQt5.QtWidgets import QComboBox, QDialog, QFormLayout, QLineEdit, QListView, QMessageBox, QPushButton, \
+    QSizePolicy, QSpacerItem
 
 from core import Stock
 from database import Session
-from gui.exchange.model import ExchangeSearchModel
+from gui.exchange.completer import ExchangeCompleter
 
 
 class StockCreateDialog(QDialog):
@@ -34,13 +33,9 @@ class StockCreateDialog(QDialog):
         form.addRow("Exchange :", self.exchange_list)
 
         # Exchange Completer Line Edit test
-        self.exchange_edit = QLineEdit()
-        exchange_completer = QCompleter()
-        exchange_completer.setCaseSensitivity(Qt.CaseInsensitive)
-        exchange_completer.setModel(ExchangeSearchModel(self.session))
-        exchange_completer.setCompletionRole(Qt.DisplayRole)
-        exchange_completer.setFilterMode(Qt.MatchContains)
-        self.exchange_edit.setCompleter(exchange_completer)
+        self.exchange_edit = QComboBox(self)
+        self.exchange_edit.setEditable(True)
+        self.exchange_edit.setCompleter(ExchangeCompleter(self.session))
         form.addRow('Exchange 2nd :', self.exchange_edit)
 
         # Space

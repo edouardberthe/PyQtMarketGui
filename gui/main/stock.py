@@ -1,8 +1,9 @@
 from PyQt5.QtCore import QModelIndex
 from PyQt5.QtWidgets import QHBoxLayout, QPushButton, QTableView, QVBoxLayout, QWidget
 
+from core import Bucket
 from database import Session
-from gui.charts import StockDataChart
+from gui.charts import BucketDataChart
 from gui.stock import StockCreateDialog, StockTableModel
 
 
@@ -42,7 +43,7 @@ class StockWidget(QWidget):
         btn_layout.addWidget(load_btn)
 
         # Right Part
-        self.chart = StockDataChart()
+        self.chart = BucketDataChart()
         main_layout.addWidget(self.chart)
 
         # Signals
@@ -50,7 +51,7 @@ class StockWidget(QWidget):
         self.setLayout(main_layout)
 
     def update(self, index: QModelIndex):
-        self.chart.stock = self.model.entity(index)
+        self.chart.bucket = Bucket([self.model.entity(index) for index in self.table.selectedIndexes()])
 
     def load(self):
         for index in self.table.selectedIndexes():

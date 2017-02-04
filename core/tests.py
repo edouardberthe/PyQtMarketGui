@@ -2,6 +2,19 @@ import unittest
 
 from core import Bucket
 from core import Exchange
+from core import Stock
+
+
+class StockTestCase(unittest.TestCase):
+
+    def test_init(self):
+        with self.assertRaises(TypeError):
+            Stock()
+        with self.assertRaises(TypeError):
+            Stock('Re')
+        with self.assertRaises(TypeError):
+            Stock(exchange=Exchange('PA'))
+        self.assertIsInstance(Stock('RE', exchange=Exchange('PA')), Stock)
 
 
 class ExchangeTestCase(unittest.TestCase):
