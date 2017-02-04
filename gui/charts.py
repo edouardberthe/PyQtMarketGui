@@ -3,7 +3,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
     NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
 
-from core import Bucket, Stock
+from core import Bucket
 from core.pair import Pair
 
 

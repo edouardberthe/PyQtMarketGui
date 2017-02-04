@@ -26,6 +26,7 @@ class StockWidget(QWidget):
         self.table.setModel(self.model)
         self.table.setToolTip("List of stocks")
         self.table.setFixedWidth(self.table.horizontalHeader().length())
+        self.model.message_emitted.connect(self.display_message)
         left_layout.addWidget(self.table)
 
         # Buttons
@@ -61,3 +62,6 @@ class StockWidget(QWidget):
 
     def new(self):
         StockCreateDialog(self).exec()
+
+    def display_message(self, message: str):
+        self.window().statusBar().showMessage(message)
